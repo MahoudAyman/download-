@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TikSave - تنزيل فيديوهات تيك توك</title>
+
+  <!-- ✅ Google AdSense — ضع publisher ID الخاص بك -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #0a0a0a; color: #fff; min-height: 100vh; }
+    .bg { position: fixed; inset: 0; background: linear-gradient(135deg,#0a0a0a,#1a0a2e,#0a0a0a); z-index:0; }
+    .bg::before { content:''; position:absolute; width:600px;height:600px; background:radial-gradient(circle,rgba(254,44,85,0.15) 0%,transparent 70%); top:-200px;right:-200px; animation:pulse 6s ease-in-out infinite; }
+    .bg::after { content:''; position:absolute; width:500px;height:500px; background:radial-gradient(circle,rgba(0,242,234,0.1) 0%,transparent 70%); bottom:-150px;left:-150px; animation:pulse 8s ease-in-out infinite reverse; }
+    @keyframes pulse { 0%,100%{transform:scale(1);opacity:.8} 50%{transform:scale(1.3);opacity:1} }
+
+    .container { position:relative; z-index:1; max-width:820px; margin:0 auto; padding:40px 20px; }
+
+    /* AdSense blocks */
+    .ad-block { background:rgba(255,255,255,0.03); border:1px dashed rgba(255,255,255,0.08); border-radius:16px; padding:8px; margin:20px 0; text-align:center; overflow:hidden; }
+    .ad-label { font-size:10px; color:rgba(255,255,255,0.2); margin-bottom:4px; text-transform:uppercase; letter-spacing:1px; }
+
+    header { text-align:center; margin-bottom:36px; }
+    .logo-icon { font-size:48px; margin-bottom:10px; }
+    .logo-text { font-size:36px; font-weight:800; background:linear-gradient(135deg,#fe2c55,#25f4ee); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+    .subtitle { color:rgba(255,255,255,0.5); margin-top:8px; font-size:15px; }
+
+    .features { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-bottom:28px; }
+    .feature-tag { background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:20px; padding:7px 14px; font-size:13px; color:rgba(255,255,255,0.6); }
+
+    .card { background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:24px; padding:36px; backdrop-filter:blur(20px); margin-bottom:24px; }
+    .input-label { display:block; font-size:14px; color:rgba(255,255,255,0.6); margin-bottom:12px; }
+    .input-row { display:flex; gap:12px; }
+    .url-input { flex:1; background:rgba(255,255,255,0.08); border:1.5px solid rgba(255,255,255,0.15); border-radius:14px; padding:16px 20px; font-size:15px; color:#fff; outline:none; direction:ltr; transition:all .3s; }
+    .url-input::placeholder { color:rgba(255,255,255,0.3); }
+    .url-input:focus { border-color:#fe2c55; background:rgba(254,44,85,0.08); box-shadow:0 0 0 4px rgba(254,44,85,0.1); }
+    .btn-fetch { background:linear-gradient(135deg,#fe2c55,#c0003c); color:#fff; border:none; border-radius:14px; padding:16px 28px; font-size:15px; font-weight:700; cursor:pointer; white-space:nowrap; box-shadow:0 4px 20px rgba(254,44,85,0.4); transition:all .3s; }
+    .btn-fetch:hover { transform:translateY(-2px); box-shadow:0 8px 30px rgba(254,44,85,0.6); }
+    .btn-fetch:disabled { opacity:.6; cursor:not-allowed; transform:none; }
+
+    .loader { display:none; text-align:center; padding:30px; }
+    .spinner { width:48px;height:48px;border:3px solid rgba(255,255,255,0.1);border-top-color:#fe2c55;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 16px; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    .loader p { color:rgba(255,255,255,0.5); font-size:14px; }
+
+    .result { display:none; margin-top:24px; }
+    .video-info { display:flex; gap:16px; margin-bottom:24px; align-items:flex-start; }
+    .thumb-ph { width:100px;height:140px;border-radius:12px;background:linear-gradient(135deg,rgba(254,44,85,0.3),rgba(37,244,238,0.3));display:flex;align-items:center;justify-content:center;font-size:40px;flex-shrink:0; }
+    .thumbnail { width:100px;height:140px;border-radius:12px;object-fit:cover;flex-shrink:0; }
+    .video-meta h3 { font-size:16px;font-weight:600;margin-bottom:8px;line-height:1.5; }
+    .video-meta p { font-size:13px;color:rgba(255,255,255,0.4);margin-bottom:4px; }
+
+    .options-label { font-size:14px;color:rgba(255,255,255,0.5);margin-bottom:12px; }
+    .options-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px; }
+    .dl-btn { display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.07);border:1.5px solid rgba(255,255,255,0.12);border-radius:12px;padding:14px 18px;color:#fff;text-decoration:none;font-size:14px;cursor:pointer;transition:all .3s;font-family:inherit;font-weight:500; }
+    .dl-btn:hover { background:rgba(254,44,85,0.15);border-color:#fe2c55;transform:translateY(-2px); }
+    .dl-btn.audio:hover { border-color:#25f4ee;background:rgba(37,244,238,0.1); }
+    .badge { background:rgba(254,44,85,0.3);color:#fe2c55;font-size:11px;padding:3px 8px;border-radius:6px;font-weight:700; }
+    .dl-btn.audio .badge { background:rgba(37,244,238,0.2);color:#25f4ee; }
+
+    .error-msg { display:none;background:rgba(254,44,85,0.1);border:1px solid rgba(254,44,85,0.3);border-radius:12px;padding:16px;color:#fe2c55;font-size:14px;margin-top:20px;text-align:center; }
+
+    .steps { display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px; }
+    .step { background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:20px;text-align:center; }
+    .step-num { width:36px;height:36px;background:linear-gradient(135deg,#fe2c55,#25f4ee);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;margin:0 auto 12px; }
+    .step h3 { font-size:14px;font-weight:600;margin-bottom:6px; }
+    .step p { font-size:12px;color:rgba(255,255,255,0.4); }
+
+    footer { text-align:center;color:rgba(255,255,255,0.25);font-size:13px;padding:24px 0; }
+    footer a { color:rgba(255,255,255,0.3);text-decoration:none; }
+
+    @media(max-width:600px) {
+      .input-row{flex-direction:column;}
+      .btn-fetch{width:100%;}
+      .steps{grid-template-columns:1fr;}
+      .video-info{flex-direction:column;align-items:center;text-align:center;}
+    }
+  </style>
+</head>
+<body>
+
+<div class="bg"></div>
+
+<div class="container">
+
+  <!-- Header -->
+  <header>
+    <div class="logo-icon">🎵</div>
+    <div class="logo-text">TikSave</div>
+    <p class="subtitle">تنزيل فيديوهات تيك توك بجودة عالية وبدون علامة مائية</p>
+  </header>
+
+  <!-- 📢 إعلان أعلى الصفحة (Leaderboard 728x90) -->
+  <div class="ad-block">
+    <div class="ad-label">إعلان</div>
+    <ins class="adsbygoogle"
+         style="display:block"
+         data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+         data-ad-slot="1111111111"
+         data-ad-format="auto"
+         data-full-width-responsive="true"></ins>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+  </div>
+
+  <!-- Features -->
+  <div class="features">
+    <div class="feature-tag">✅ بدون علامة مائية</div>
+    <div class="feature-tag">⚡ تنزيل سريع</div>
+    <div class="feature-tag">🎵 استخراج MP3</div>
+    <div class="feature-tag">🆓 مجاني 100%</div>
+    <div class="feature-tag">📱 يدعم الهاتف</div>
+  </div>
+
+  <!-- Main Card -->
+  <div class="card">
+    <label class="input-label">📎 الصق رابط الفيديو من تيك توك</label>
+    <div class="input-row">
+      <input type="text" class="url-input" id="urlInput" placeholder="https://www.tiktok.com/@username/video/..." />
+      <button class="btn-fetch" id="fetchBtn" onclick="fetchVideo()">🔍 تحليل</button>
+    </div>
+
+    <div class="loader" id="loader">
+      <div class="spinner"></div>
+      <p>جاري تحليل الفيديو...</p>
+    </div>
+
+    <div class="error-msg" id="errorMsg"></div>
+
+    <div class="result" id="result">
+      <div class="video-info">
+        <div class="thumb-ph" id="thumbPh">🎬</div>
+        <img class="thumbnail" id="thumbnail" src="" alt="" style="display:none" />
+        <div class="video-meta">
+          <h3 id="videoTitle"></h3>
+          <p id="videoAuthor"></p>
+          <p id="videoStats"></p>
+          <p id="videoDuration"></p>
+        </div>
+      </div>
+
+      <!-- 📢 إعلان وسط الصفحة (بعد معلومات الفيديو) -->
+      <div class="ad-block">
+        <div class="ad-label">إعلان</div>
+        <ins class="adsbygoogle"
+             style="display:block"
+             data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+             data-ad-slot="2222222222"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+      </div>
+
+      <div class="options-label">اختر صيغة التنزيل</div>
+      <div class="options-grid" id="downloadOptions"></div>
+    </div>
+  </div>
+
+  <!-- Steps -->
+  <div class="steps">
+    <div class="step"><div class="step-num">1</div><h3>انسخ الرابط</h3><p>افتح تيك توك وانسخ رابط الفيديو</p></div>
+    <div class="step"><div class="step-num">2</div><h3>الصق وحلّل</h3><p>الصق الرابط واضغط تحليل</p></div>
+    <div class="step"><div class="step-num">3</div><h3>نزّل الفيديو</h3><p>اختر الجودة وابدأ التنزيل</p></div>
+  </div>
+
+  <!-- 📢 إعلان أسفل الصفحة -->
+  <div class="ad-block">
+    <div class="ad-label">إعلان</div>
+    <ins class="adsbygoogle"
+         style="display:block"
+         data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+         data-ad-slot="3333333333"
+         data-ad-format="auto"
+         data-full-width-responsive="true"></ins>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+  </div>
+
+  <footer>
+    <p>TikSave — أداة مجانية لتنزيل فيديوهات تيك توك</p>
+    <p style="margin-top:6px;font-size:11px;color:rgba(255,255,255,0.15)">للاستخدام الشخصي فقط · احترم حقوق الملكية الفكرية</p>
+  </footer>
+
+</div>
+
+<script>
+async function fetchVideo() {
+  const input = document.getElementById('urlInput').value.trim();
+  const loader = document.getElementById('loader');
+  const result = document.getElementById('result');
+  const errorMsg = document.getElementById('errorMsg');
+  const fetchBtn = document.getElementById('fetchBtn');
+
+  result.style.display = 'none';
+  errorMsg.style.display = 'none';
+
+  if (!input) { showError('⚠️ الرجاء إدخال رابط الفيديو'); return; }
+  if (!input.includes('tiktok.com') && !input.includes('vm.tiktok')) {
+    showError('⚠️ الرجاء إدخال رابط تيك توك صحيح'); return;
+  }
+
+  loader.style.display = 'block';
+  fetchBtn.disabled = true;
+
+  try {
+    // استدعاء السيرفر الخاص بك
+    const res = await fetch(`/api/info?url=${encodeURIComponent(input)}`);
+    const data = await res.json();
+
+    if (data.error) { showError('❌ ' + data.error); return; }
+    displayResult(data, input);
+
+  } catch(e) {
+    showError('❌ تعذّر الاتصال بالسيرفر. حاول مرة أخرى.');
+  } finally {
+    loader.style.display = 'none';
+    fetchBtn.disabled = false;
+  }
+}
+
+function displayResult(data, originalUrl) {
+  document.getElementById('videoTitle').textContent = data.title || 'فيديو تيك توك';
+  document.getElementById('videoAuthor').textContent = '👤 ' + (data.author || 'unknown');
+  document.getElementById('videoStats').textContent = data.like_count ? `❤️ ${fmt(data.like_count)}` : '';
+  document.getElementById('videoDuration').textContent = data.duration ? `⏱️ ${fmtDur(data.duration)}` : '';
+
+  // Thumbnail
+  if (data.thumbnail) {
+    const img = document.getElementById('thumbnail');
+    const ph = document.getElementById('thumbPh');
+    img.src = data.thumbnail;
+    img.style.display = 'block';
+    ph.style.display = 'none';
+  }
+
+  // Download buttons
+  const opts = document.getElementById('downloadOptions');
+  opts.innerHTML = '';
+
+  (data.formats || []).forEach(f => {
+    const a = document.createElement('a');
+    a.href = `/api/download?url=${encodeURIComponent(originalUrl)}&format_id=${f.format_id}&ext=${f.ext}`;
+    a.className = 'dl-btn' + (f.type === 'audio' ? ' audio' : '');
+    a.innerHTML = `<span>${f.type === 'audio' ? '🎵' : '📥'} ${f.quality}</span><span class="badge">${f.ext.toUpperCase()}</span>`;
+    opts.appendChild(a);
+  });
+
+  if (!data.formats || data.formats.length === 0) {
+    opts.innerHTML = '<p style="color:rgba(255,255,255,0.4);font-size:14px">لا توجد صيغ متاحة</p>';
+  }
+
+  document.getElementById('result').style.display = 'block';
+}
+
+function showError(msg) {
+  const e = document.getElementById('errorMsg');
+  e.textContent = msg;
+  e.style.display = 'block';
+}
+
+function fmt(n) {
+  if (!n) return '0';
+  if (n >= 1e6) return (n/1e6).toFixed(1) + 'M';
+  if (n >= 1000) return (n/1000).toFixed(1) + 'K';
+  return n;
+}
+
+function fmtDur(s) {
+  const m = Math.floor(s / 60), sec = s % 60;
+  return `${m}:${String(sec).padStart(2,'0')}`;
+}
+
+document.getElementById('urlInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') fetchVideo();
+});
+</script>
+</body>
+  </html>
